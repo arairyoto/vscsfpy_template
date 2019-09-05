@@ -10,58 +10,58 @@ jobs:
     steps:
       - checkout
       - run:
-        name: install pipenv
-        command: pip install pipenv
+          name: install pipenv
+          command: pip install pipenv
       - run:
-        name: install serverless
-        command: npm i serverless -g
+          name: install serverless
+          command: npm i serverless -g
       - run:
-        name: pipenv install
-        command: export PIPENV_VENV_IN_PROJECT=1 | pipenv sync
+          name: pipenv install
+          command: export PIPENV_VENV_IN_PROJECT=1 | pipenv sync
       - run:
-        name: npm install
-        command: npm ci
+          name: npm install
+          command: npm ci
       - run:
-        name: install serverless-dynamodb-local
-        command: sls dynamodb install
+          name: install serverless-dynamodb-local
+          command: sls dynamodb install
       - run:
-        name: activate pipenv
-        command: pipenv shell
+          name: activate pipenv
+          command: pipenv shell
   lint:
     executor:
       name: default
     steps:
       - run:
-        name: pylint
-        command: pylint --rcfile=./settings/pylintrc src/*.py
+          name: pylint
+          command: pylint --rcfile=./settings/pylintrc src/*.py
   test:
     executor:
       name: default
     steps:
       - run:
-        name: change directory
-        command: cd tests
+          name: change directory
+          command: cd tests
       - run:
-        name: test
-        command: pytest -v
+          name: test
+          command: pytest -v
   deploy:
     executor:
       name: default
     steps:
       - run:
-        name: sls deploy
-        command: sls deploy --stage dev --regiou us-east-1 --profile default
+          name: sls deploy
+          command: sls deploy --stage dev --regiou us-east-1 --profile default
 workflows:
   deploy-flow:
     jobs:
       - setup
       - lint:
-        requires:
-          - setup
+          requires:
+            - setup
       - test:
-        requires:
-          - lint
+          requires:
+            - lint
       - deploy:
-        requires:
-          - test
+          requires:
+            - test
 
