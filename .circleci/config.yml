@@ -9,7 +9,7 @@ commands:
       - run:
           name: Install node modules
           command: |
-            npm ci
+            npm i
       - run:
           name: Install python modules
           command: |
