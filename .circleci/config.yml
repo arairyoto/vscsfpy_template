@@ -91,12 +91,10 @@ jobs:
             --region ${AWS_DEFAULT_REGION} \
             --timestamp ${TIMESTAMP}
 workflows:
-  version: 2
+  version: 2.1
   deploy:
     jobs:
       - test:
-          requires:
-            - setup
       - deploy-dev:
           context: aws-dev
           requires:
