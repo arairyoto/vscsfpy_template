@@ -16,7 +16,7 @@ commands:
       - run:
           name: Install pipenv
           command: |
-            sodo pip install pipenv
+            sudo pip install pipenv
       - run:
           name: Check node version
           command: |
