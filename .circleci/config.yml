@@ -20,7 +20,7 @@ commands:
       - run:
           name: Check node version
           command: |
-            sudo npm i -g npm
+            sudo npm update -g npm
             node -v
             npm -v
       - run:
