@@ -1,19 +1,19 @@
-version: 2
+version: 2.1
 commands:
-  - setup:
-      steps:
-        - run:
-            name: Install pipenv
-            command: |
-              pip install pipenv
-        - run:
-            name: Install node modules
-            command: |
-              npm ci
-        - run:
-            name: Install python modules
-            command: |
-              pipenv sync
+  setup:
+    steps:
+      - run:
+          name: Install pipenv
+          command: |
+            pip install pipenv
+      - run:
+          name: Install node modules
+          command: |
+            npm ci
+      - run:
+          name: Install python modules
+          command: |
+            pipenv sync
 jobs:
   test:
     machine: true
