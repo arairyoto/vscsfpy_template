@@ -94,7 +94,7 @@ workflows:
   version: 2.1
   deploy:
     jobs:
-      - test:
+      - test
       - deploy-dev:
           context: aws-dev
           requires:
