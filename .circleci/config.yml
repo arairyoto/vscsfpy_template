@@ -38,12 +38,12 @@ jobs:
     steps:
       - checkout
       - setup
-      - run:
-          name: Unit Test
-          command: |
-            cd tests
-            pipenv run pytest -v
-            cd ../
+      # - run:
+      #     name: Unit Test
+      #     command: |
+      #       cd tests
+      #       pipenv run pytest -v
+      #       cd ../
       - run:
           name: Lint Test
           command: |
