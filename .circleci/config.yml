@@ -3,6 +3,8 @@ executors:
   default:
     docker:
       - image: circleci/python:3.6.3
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
 commands:
   setup:
     steps:
@@ -14,7 +16,7 @@ commands:
       - run:
           name: Install pipenv
           command: |
-            pip install pipenv
+            sodo pip install pipenv
       - run:
           name: Check node version
           command: |
