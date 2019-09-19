@@ -1,11 +1,25 @@
 version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/python:3.6.3
 commands:
   setup:
     steps:
       - run:
+          name: Check python version
+          command: |
+            python -V
+            pip -V
+      - run:
           name: Install pipenv
           command: |
             pip install pipenv
+      - run:
+          name: Check node version
+          command: |
+            node -v
+            npm -v
       - run:
           name: Install node modules
           command: |
@@ -16,8 +30,8 @@ commands:
             pipenv sync
 jobs:
   test:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
@@ -32,8 +46,8 @@ jobs:
           command: |
             pipenv run pylint src
   deploy-dev:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
@@ -44,8 +58,8 @@ jobs:
             --stage dev \
             --region ${AWS_DEFAULT_REGION}
   deploy-stg:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
@@ -56,8 +70,8 @@ jobs:
             --stage stg \
             --region ${AWS_DEFAULT_REGION}
   deploy-prod:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
@@ -68,8 +82,8 @@ jobs:
             --stage prod \
             --region ${AWS_DEFAULT_REGION}
   smoke-test:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
@@ -80,8 +94,8 @@ jobs:
             -f ${FUNCTION_NAME} \
             -d "\{\}"
   rollback:
-    docker:
-      image: circleci/python:3.6.3
+    executor:
+      name: default
     steps:
       - checkout
       - setup
