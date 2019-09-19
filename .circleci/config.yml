@@ -30,6 +30,7 @@ commands:
           name: Install python modules
           command: |
             pipenv sync
+            pipenv sync --dev
 jobs:
   test:
     executor:
