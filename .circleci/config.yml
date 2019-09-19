@@ -1,67 +1,128 @@
-version: 2.1
-executors:
-  default:
-    docker:
-      - image: jiripuc/circleci-python-node:stretch-python-3.6.8-node-10.14.2
-jobs:
+version: 2
+commands:
   setup:
-    executor:
-      name: default
+    steps:
+      - run:
+          name: Install pipenv
+          command: |
+            pip install pipenv
+      - run:
+          name: Install node modules
+          command: |
+            npm ci
+      - run:
+          name: Install python modules
+          command: |
+            pipenv sync
+jobs:
+  test:
+    machine: true
     steps:
       - checkout
+      - setup
       - run:
-          name: install pipenv
-          command: pip install pipenv
+        name: Unit Test
+        command: |
+          cd tests
+          pipenv run pytest -v
+          cd ../
       - run:
-          name: install serverless
-          command: npm i serverless -g
-      - run:
-          name: pipenv install
-          command: export PIPENV_VENV_IN_PROJECT=1 | pipenv sync
-      - run:
-          name: npm install
-          command: npm ci
-      - run:
-          name: install serverless-dynamodb-local
-          command: sls dynamodb install
-      - run:
-          name: activate pipenv
-          command: pipenv shell
-  lint:
-    executor:
-      name: default
+        name: Lint Test
+        command: |
+          pipenv run pylint src
+  deploy-dev:
+    machine: true
     steps:
+      - checkout
+      - setup
       - run:
-          name: pylint
-          command: pylint --rcfile=./settings/pylintrc src/*.py
-  test:
-    executor:
-      name: default
+        name: Deploy
+        command: |
+          ./node_modules/.bin/serverless deploy \
+          --stage dev \
+          --region ${AWS_DEFAULT_REGION}
+  deploy-stg:
+    machine: true
     steps:
+      - checkout
+      - setup
       - run:
-          name: change directory
-          command: cd tests
-      - run:
-          name: test
-          command: pytest -v
-  deploy:
-    executor:
-      name: default
+        name: Deploy
+        command: |
+          ./node_modules/.bin/serverless deploy \
+          --stage stg \
+          --region ${AWS_DEFAULT_REGION}
+  deploy-prod:
+    machine: true
     steps:
+      - checkout
+      - setup
       - run:
-          name: sls deploy
-          command: sls deploy --stage dev --regiou us-east-1 --profile default
+        name: Deploy
+        command: |
+          ./node_modules/.bin/serverless deploy \
+          --stage prod \
+          --region ${AWS_DEFAULT_REGION}
+  smoke-test:
+    machine: true
+    steps:
+      - checkout
+      - setup
+      - run:
+        name: Smoke test
+        command: |
+          ./node_modules/.bin/serverless invoke \
+          -f ${FUNCTION_NAME} \
+          -d "\{\}"
+  rollback:
+    machine: true
+    steps:
+      - checkout
+      - setup
+      - run:
+        name: Get previous version
+        command: |
+          echo 'export TIMESTAMP=`sls deploy list --stage dev --region ap-northeast-1 | grep Datetime | tail -n 2 | sed -e "s/^Serverless: Datetime: //" | sed "2d"`' >> $BASH_ENV
+      - run:
+        name: Rollback
+        command: |
+          ./node_modules/.bin/serverless rollback \
+          --stage dev \
+          --region ${AWS_DEFAULT_REGION} \
+          --timestamp ${TIMESTAMP}
 workflows:
-  deploy-flow:
+  version: 2
+  deploy:
     jobs:
       - setup
-      - lint:
-          requires:
-            - setup
       - test:
           requires:
-            - lint
-      - deploy:
+            - setup
+      - deploy-dev:
+          context: aws-dev
           requires:
             - test
-
+          filters:
+            branches:
+              only: /develop/
+      - deploy-stg:
+          context: aws-stg
+          requires:
+            - test
+          filters:
+            branches:
+              only: /release/
+      - deploy-prod:
+          context: aws-prod
+          requires:
+            - test
+          filters:
+            branches:
+              only: /master/
+      - smoke-test:
+          context: aws-prod
+          requires:
+            - deploy-prod
+          filters:
+            branches:
+              only: /master/
