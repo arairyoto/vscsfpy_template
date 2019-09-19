@@ -2,7 +2,7 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/python:3.6.3
+      - image: circleci/python:3.6.3-node
     environment:
       PIPENV_VENV_IN_PROJECT: true
 commands:
@@ -25,7 +25,7 @@ commands:
       - run:
           name: Install node modules
           command: |
-            npm i
+            npm ci
       - run:
           name: Install python modules
           command: |
