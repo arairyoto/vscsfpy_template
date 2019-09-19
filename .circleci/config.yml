@@ -21,75 +21,75 @@ jobs:
       - checkout
       - setup
       - run:
-        name: Unit Test
-        command: |
-          cd tests
-          pipenv run pytest -v
-          cd ../
+          name: Unit Test
+          command: |
+            cd tests
+            pipenv run pytest -v
+            cd ../
       - run:
-        name: Lint Test
-        command: |
-          pipenv run pylint src
+          name: Lint Test
+          command: |
+            pipenv run pylint src
   deploy-dev:
     machine: true
     steps:
       - checkout
       - setup
       - run:
-        name: Deploy
-        command: |
-          ./node_modules/.bin/serverless deploy \
-          --stage dev \
-          --region ${AWS_DEFAULT_REGION}
+          name: Deploy
+          command: |
+            ./node_modules/.bin/serverless deploy \
+            --stage dev \
+            --region ${AWS_DEFAULT_REGION}
   deploy-stg:
     machine: true
     steps:
       - checkout
       - setup
       - run:
-        name: Deploy
-        command: |
-          ./node_modules/.bin/serverless deploy \
-          --stage stg \
-          --region ${AWS_DEFAULT_REGION}
+          name: Deploy
+          command: |
+            ./node_modules/.bin/serverless deploy \
+            --stage stg \
+            --region ${AWS_DEFAULT_REGION}
   deploy-prod:
     machine: true
     steps:
       - checkout
       - setup
       - run:
-        name: Deploy
-        command: |
-          ./node_modules/.bin/serverless deploy \
-          --stage prod \
-          --region ${AWS_DEFAULT_REGION}
+          name: Deploy
+          command: |
+            ./node_modules/.bin/serverless deploy \
+            --stage prod \
+            --region ${AWS_DEFAULT_REGION}
   smoke-test:
     machine: true
     steps:
       - checkout
       - setup
       - run:
-        name: Smoke test
-        command: |
-          ./node_modules/.bin/serverless invoke \
-          -f ${FUNCTION_NAME} \
-          -d "\{\}"
+          name: Smoke test
+          command: |
+            ./node_modules/.bin/serverless invoke \
+            -f ${FUNCTION_NAME} \
+            -d "\{\}"
   rollback:
     machine: true
     steps:
       - checkout
       - setup
       - run:
-        name: Get previous version
-        command: |
-          echo 'export TIMESTAMP=`sls deploy list --stage dev --region ap-northeast-1 | grep Datetime | tail -n 2 | sed -e "s/^Serverless: Datetime: //" | sed "2d"`' >> $BASH_ENV
+          name: Get previous version
+          command: |
+            echo 'export TIMESTAMP=`sls deploy list --stage dev --region ap-northeast-1 | grep Datetime | tail -n 2 | sed -e "s/^Serverless: Datetime: //" | sed "2d"`' >> $BASH_ENV
       - run:
-        name: Rollback
-        command: |
-          ./node_modules/.bin/serverless rollback \
-          --stage dev \
-          --region ${AWS_DEFAULT_REGION} \
-          --timestamp ${TIMESTAMP}
+          name: Rollback
+          command: |
+            ./node_modules/.bin/serverless rollback \
+            --stage dev \
+            --region ${AWS_DEFAULT_REGION} \
+            --timestamp ${TIMESTAMP}
 workflows:
   version: 2
   deploy:
