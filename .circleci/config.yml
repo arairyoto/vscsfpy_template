@@ -16,7 +16,8 @@ commands:
             pipenv sync
 jobs:
   test:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
@@ -31,7 +32,8 @@ jobs:
           command: |
             pipenv run pylint src
   deploy-dev:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
@@ -42,7 +44,8 @@ jobs:
             --stage dev \
             --region ${AWS_DEFAULT_REGION}
   deploy-stg:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
@@ -53,7 +56,8 @@ jobs:
             --stage stg \
             --region ${AWS_DEFAULT_REGION}
   deploy-prod:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
@@ -64,7 +68,8 @@ jobs:
             --stage prod \
             --region ${AWS_DEFAULT_REGION}
   smoke-test:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
@@ -75,7 +80,8 @@ jobs:
             -f ${FUNCTION_NAME} \
             -d "\{\}"
   rollback:
-    machine: true
+    docker:
+      image: circleci/python:3.6.3
     steps:
       - checkout
       - setup
