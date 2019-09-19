@@ -20,13 +20,12 @@ commands:
       - run:
           name: Check node version
           command: |
-            sudo npm update -g npm
             node -v
             npm -v
       - run:
           name: Install node modules
           command: |
-            npm ci
+            npm i
       - run:
           name: Install python modules
           command: |
